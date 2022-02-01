@@ -43,15 +43,17 @@ function makeResponsive() {
         demographic_data.forEach(function (data) {
             data.poverty = +data.poverty
             data.healthcare = +data.healthcare;
+            data.income = +data.income;
+            data.obesity = +data.obesity;
         });
         // You need to create a scatter plot between two of the data variables such as `Healthcare vs. Poverty` or `Smokers vs. Age`.
         // create scales
         var xLinearScale = d3.scaleLinear()
-            .domain([20, d3.max(demographic_data, d => d.poverty)])
+            .domain([8, d3.max(demographic_data, d => d.poverty)])
             .range([0, width]);
 
         var yLinearScale = d3.scaleLinear()
-            .domain([0, d3.max(demographic_data, d => d.healthcare)])
+            .domain([3, d3.max(demographic_data, d => d.healthcare)])
             .range([height, 0]);
 
         // create axes
@@ -86,41 +88,43 @@ function makeResponsive() {
             .attr("cx", d => xLinearScale(d.poverty))
             .attr("cy", d => yLinearScale(d.healthcare))
             .attr("r", "10")
-            .attr("fill", "gold")
+            .attr("fill", "red")
             .attr("stroke-width", "1")
             .attr("stroke", "black");
 
         // Step 1: Initialize Tooltip
         var toolTip = d3.tip()
-            .attr("class", "tooltip")
+            .attr("class", "tooltip", "transform")
             .offset([80, -60])
             .html(function (d) {
-                return (`${d.poverty}<br>Hair length: ${d.healthcare}<br>Hits: ${d.state}`);
+                return (`Poverty ${d.poverty}%<br>Healthcare ${d.healthcare}% <br>Obesity: ${d.obesity}% <br>Average Income: ${d.income} <br>State: ${d.state}`);
             });
 
         // Step 2: Create the tooltip in chartGroup.
-        // chartGroup.call(toolTip);
+        chartGroup.call(toolTip);
 
         // Step 3: Create "mouseover" event listener to display tooltip
         circlesGroup.on("mouseover", function (d) {
             toolTip.show(d, this);
+            
         })
             // Step 4: Create "mouseout" event listener to hide tooltip
             .on("mouseout", function (d) {
                 toolTip.hide(d);
+
             });
         chartGroup.append("text")
             .attr("transform", "rotate(-90)")
-            .attr("y", 0 - margin.left + 40)
+            .attr("y", 0 - margin.left)
             .attr("x", 0 - (height / 2))
             .attr("dy", "1em")
             .attr("class", "axisText")
             .text("% of poverty in population");
 
         chartGroup.append("text")
-            .attr("transform", `translate(${width / 2}, ${height + margin.top + 30})`)
+            .attr("transform", `translate(${width / 2}, ${height + margin.top})`)
             .attr("class", "axisText")
-            .text("Hair Metal Band Hair Length (inches)");
+            .text("% of provided healthcare in population");
     }).catch(function (error) {
         console.log(error);
     });
